@@ -16,13 +16,25 @@ sudo apt update && sudo apt upgrade -y
 # Install Apache, MariaDB, PHP, and required extensions
 sudo apt install -y apache2 mariadb-server php php-mysql libapache2-mod-php php-cli php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip wget unzip
 
+# Ensure curl is installed
+if ! command -v curl >/dev/null 2>&1; then
+    echo "curl not found, installing..."
+    sudo apt install -y curl
+fi
+
 # Enable Apache mods and restart
 sudo a2enmod rewrite
 sudo systemctl restart apache2
 
 # Secure MariaDB installation (optional, interactive)
-echo "Securing MariaDB installation..."
-sudo mysql_secure_installation
+echo "Skipping MariaDB secure installation for idempotency. Please run manually if needed."
+# sudo mysql_secure_installation
+
+# Check if WordPress is already installed
+if [ -f /var/www/html/wp-config.php ]; then
+    echo "WordPress already installed. Skipping download and setup."
+    exit 0
+fi
 
 # Create WordPress database and user
 sudo mysql -u root <<MYSQL_SCRIPT
